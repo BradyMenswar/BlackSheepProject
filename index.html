@@ -14,22 +14,25 @@
         <div class="words-container" id="words">
 
         </div>
+        <div class="words-container" id="final-words"></div>
+        <div style="display: none" class="final-words" id="final">
+            <h2>Your five words are: </h2>
+            <h3></h3>
+        </div>
         <div class="battle-container" id="battle">
             <div class="timer-section">
                 <h2>Time remaining:</h2>
             </div>
             
             <div class="battle-section">
-                <button class="left-battle" id="wordL">
-                    Word 1
-                </button>
-                <button class="right-battle" id="wordR">
-                    Word 2
-                </bitton>
+                <button class="left-battle" id="wordL"></button>
+            
+                <button class="right-battle" id="wordR"></button>
             </div>
         </div>
 
-        <button class="submit-button" onclick="sectionTwo()">Submit</button>
+        <button class="submit-button" id="submit1" disabled onclick="sectionTwo()">Submit</button>
+        <button class="submit-button" id="submit3" disabled style="display: none;" onclick="finalSection()">Submit</button>
     </div>
     
 </body>

@@ -95,6 +95,14 @@
     font-size: 2rem;
 }
 
+.final-words {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    overflow: hidden;
+    padding: 1rem;
+    gap: 1rem;
+}
 
 @media (min-width: 600px) {
     .words-container {

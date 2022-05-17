@@ -1,9 +1,21 @@
 let wordsContainer = document.getElementById("words");
-let wordsBattle = document.getElementById("battle")
+let finalWordsContainer = document.getElementById("final-words");
+
+let wordsBattle = document.getElementById("battle");
+
+let totalActive = 0;
 
 let wordL = document.getElementById("wordL");
 let wordR = document.getElementById("wordR");
 
+let sectionOneSubmit = document.getElementById("submit1");
+let sectionThreeSubmit = document.getElementById("submit3");
+
+let finalWords = document.getElementById("final");
+let finalChosenWords = [];
+let chosenWords = [];
+
+let index = 0;
 /*
     Connection: 0
     Authenticity: 1
@@ -92,6 +104,8 @@ let wordList = [
     
 ]
 
+let minWords = 12;
+
 function shuffleArray(array) {
     for (var i = array.length - 1; i > 0; i--) {
         var j = Math.floor(Math.random() * (i + 1));
@@ -109,28 +123,51 @@ function addWord() {
     wordsContainer.appendChild(newWord);
 }
 
-function fillWords() {
-    shuffleArray(wordList);
-    wordList.forEach(w => {
+function fillWords(words, container, numActive, button, mode) {
+    shuffleArray(words);
+    words.forEach(w => {
         let newWord = document.createElement("button");
         let newText = document.createTextNode(w.word);
         newWord.classList.add("word-button");
         newWord.setAttribute("value", w.value);
-        newWord.setAttribute("onclick", "toggleActive(this)")
+        newWord.setAttribute("onclick", "toggleActive(this," + numActive + "," + button.id +  "," + mode + ")");
 
         newWord.appendChild(newText);
-        wordsContainer.appendChild(newWord);
+        container.appendChild(newWord);
     });
 }
 
-function toggleActive(callElement) {
+function toggleActive(callElement, numActive, button, mode) {
+    if(callElement.classList.contains("active")) {
+        totalActive--;
+    }
+    else {
+        totalActive++;
+    }
     callElement.classList.toggle("active");
+
+    if(mode === true) {
+        if(totalActive >= numActive) {
+        
+            button.disabled = false;
+        }
+        else {
+            button.disabled = true;
+        }
+    }
+    else {
+        if(totalActive === numActive) {
+            button.disabled = false;
+        }
+        else {
+            button.disabled = true;
+        }
+    }
 }
 
 function sectionTwo() {
     let chosenWordElements = document.querySelectorAll(".active");
-
-    let chosenWords = [];
+    totalActive = 0;
     chosenWordElements.forEach(e => {
         chosenWords.push({word: e.textContent, value: e.value});
     });
@@ -138,13 +175,86 @@ function sectionTwo() {
     console.log(chosenWords);
 
     wordsContainer.style.display = "none";
+    sectionOneSubmit.style.display = "none";
     wordsBattle.style.display = "flex";
 
-    wordL.textContent = chosenWords[0].word;
-    wordR.textContent = chosenWords[1].word;
+    if(chosenWords.length <= minWords) {
+        wordsBattle.style.display = "none";
+        sectionThree();
+        return;
+    }
+    updateWords();
+
+         
 }
 
+function sectionThree() {
+    finalWordsContainer.style.display = "flex";
+    wordsBattle.style.display = "none";
+    sectionThreeSubmit.style.display = "block";
+
+    while(wordsContainer.firstChild) {
+        wordsContainer.removeChild(wordsContainer.firstChild);
+    }
+    fillWords(chosenWords, finalWordsContainer, 5, sectionThreeSubmit, false);
+
+}
+
+function finalSection() {
+    let chosenWordElements = document.querySelectorAll(".active");
+    chosenWordElements.forEach(e => {
+        finalChosenWords.push(e.textContent);
+    });
+    finalWordsContainer.style.display = "none";
+    sectionThreeSubmit.style.display = "none";
+    finalWords.style.display = "flex";
+
+    finalWords.children[1].textContent = finalChosenWords[0] + ", " +  finalChosenWords[1] + ", " +  finalChosenWords[2] + ", " +  finalChosenWords[3] + ", " + finalChosenWords[4];
+
+}
+function updateWords() {
+    
+    wordL.textContent = chosenWords[0].word;
+    let found = false;
+    for(var i = 1; i < chosenWords.length; i++) {
+        if(chosenWords[i].value === chosenWords[0].value) {
+            wordR.textContent = chosenWords[i].word;
+            found = true;
+            break;
+        }
+        index++;
+    }
+    if(found === false) {
+        wordR.textContent = chosenWords[1].word;
+    }
+}
+
+document.addEventListener("click", e => {
+    if(!e.target.classList.contains("left-battle") && !e.target.classList.contains("right-battle")) {
+        return;
+    }
+    let isLeftWord = e.target.classList.contains("left-battle");
+    let isRightWord = e.target.classList.contains("right-battle");
+
+    if(isLeftWord) {
+        chosenWords.push(chosenWords.splice(0,1)[0]);
+        chosenWords.splice(index, 1);
+    }
+    if(isRightWord) {
+        chosenWords.push(chosenWords.splice(index, 1)[0]);
+        chosenWords.shift();
+    }
+
+    if(chosenWords.length <= minWords) {
+        sectionThree();
+        return;
+    }
+    updateWords();
+    index = 0;
 
 
+    console.log(chosenWords)
+})  
 
-fillWords();
+
+fillWords(wordList, wordsContainer, minWords, sectionOneSubmit, true);
